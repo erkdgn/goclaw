@@ -1,5 +1,6 @@
 /** Client-side validation for skill ZIP files before upload.
  * Mirrors server-side checks in internal/http/skills_upload.go */
+import JSZip from "jszip";
 
 export interface SkillZipValidation {
   valid: boolean;
@@ -25,9 +26,7 @@ export async function validateSkillZip(file: File): Promise<SkillZipValidation> 
     return { valid: false, error: "upload.tooLarge" };
   }
 
-  // Lazy-load JSZip to keep main bundle small
-  const JSZip = (await import("jszip")).default;
-  let zip: InstanceType<typeof JSZip>;
+  let zip: JSZip;
   try {
     zip = await JSZip.loadAsync(file);
   } catch {
@@ -62,7 +61,7 @@ export async function validateSkillZip(file: File): Promise<SkillZipValidation> 
 }
 
 /** Find SKILL.md content — root level or inside a single top-level directory */
-async function findSkillMd(zip: { files: Record<string, { dir: boolean; async(type: "string"): Promise<string> }> }): Promise<string | null> {
+async function findSkillMd(zip: JSZip): Promise<string | null> {
   // Try root
   if (zip.files["SKILL.md"] && !zip.files["SKILL.md"].dir) {
     return zip.files["SKILL.md"].async("string");
