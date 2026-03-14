@@ -22,6 +22,9 @@ export const queryKeys = {
     all: ["customTools"] as const,
     list: (params: Record<string, unknown>) => ["customTools", params] as const,
   },
+  cliCredentials: {
+    all: ["cliCredentials"] as const,
+  },
   mcp: {
     all: ["mcp"] as const,
   },

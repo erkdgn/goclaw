@@ -48,6 +48,7 @@ type Server struct {
 	delegationsHandler      *httpapi.DelegationsHandler      // delegation history API
 	builtinToolsHandler     *httpapi.BuiltinToolsHandler     // builtin tool management API
 	pendingMessagesHandler  *httpapi.PendingMessagesHandler  // pending messages API
+	secureCLIHandler       *httpapi.SecureCLIHandler        // secure CLI credential CRUD API
 	memoryHandler           *httpapi.MemoryHandler           // memory management API
 	kgHandler               *httpapi.KnowledgeGraphHandler   // knowledge graph API
 	oauthHandler            *httpapi.OAuthHandler            // OAuth endpoints
@@ -191,6 +192,11 @@ func (s *Server) BuildMux() *http.ServeMux {
 	// Custom tool CRUD API
 	if s.customToolsHandler != nil {
 		s.customToolsHandler.RegisterRoutes(mux)
+	}
+
+	// Secure CLI credential CRUD API
+	if s.secureCLIHandler != nil {
+		s.secureCLIHandler.RegisterRoutes(mux)
 	}
 
 	// Channel instance CRUD API
@@ -461,6 +467,9 @@ func (s *Server) SetPendingMessagesHandler(h *httpapi.PendingMessagesHandler) {
 func (s *Server) SetBuiltinToolsHandler(h *httpapi.BuiltinToolsHandler) {
 	s.builtinToolsHandler = h
 }
+
+// SetSecureCLIHandler sets the secure CLI credential CRUD handler.
+func (s *Server) SetSecureCLIHandler(h *httpapi.SecureCLIHandler) { s.secureCLIHandler = h }
 
 // SetOAuthHandler sets the OAuth handler (available in all modes).
 func (s *Server) SetOAuthHandler(h *httpapi.OAuthHandler) { s.oauthHandler = h }

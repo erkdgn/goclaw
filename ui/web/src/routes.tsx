@@ -90,6 +90,9 @@ const ContactsPage = lazy(() =>
 const ActivityPage = lazy(() =>
   import("@/pages/activity/activity-page").then((m) => ({ default: m.ActivityPage })),
 );
+const CliCredentialsPage = lazy(() =>
+  import("@/pages/cli-credentials/cli-credentials-page").then((m) => ({ default: m.CliCredentialsPage })),
+);
 
 function PageLoader() {
   return (
@@ -161,6 +164,7 @@ export function AppRoutes() {
           <Route path={ROUTES.PENDING_MESSAGES} element={<PendingMessagesPage />} />
           <Route path={ROUTES.MEMORY} element={<MemoryPage />} />
           <Route path={ROUTES.KNOWLEDGE_GRAPH} element={<KnowledgeGraphPage />} />
+          <Route path={ROUTES.CLI_CREDENTIALS} element={<CliCredentialsPage />} />
         </Route>
 
         {/* Catch-all → overview */}
