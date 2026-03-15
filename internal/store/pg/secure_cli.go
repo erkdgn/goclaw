@@ -56,7 +56,7 @@ func (s *PGSecureCLIStore) Create(ctx context.Context, b *store.SecureCLIBinary)
 		 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
 		b.ID, b.BinaryName, nilStr(derefStr(b.BinaryPath)), b.Description,
 		envBytes,
-		jsonOrEmpty(b.DenyArgs), jsonOrEmpty(b.DenyVerbose),
+		jsonOrEmptyArray(b.DenyArgs), jsonOrEmptyArray(b.DenyVerbose),
 		b.TimeoutSeconds, b.Tips,
 		nilUUID(b.AgentID), b.Enabled,
 		b.CreatedBy, now, now,
@@ -151,7 +151,23 @@ func (s *PGSecureCLIStore) scanRows(rows *sql.Rows) ([]store.SecureCLIBinary, er
 	return result, nil
 }
 
+// secureCLIAllowedFields is the allowlist of columns that can be updated via execMapUpdate.
+// Defense-in-depth: prevents column name injection even if caller skips validation.
+var secureCLIAllowedFields = map[string]bool{
+	"binary_name": true, "binary_path": true, "description": true,
+	"encrypted_env": true, "deny_args": true, "deny_verbose": true,
+	"timeout_seconds": true, "tips": true, "agent_id": true, "enabled": true,
+	"updated_at": true,
+}
+
 func (s *PGSecureCLIStore) Update(ctx context.Context, id uuid.UUID, updates map[string]any) error {
+	// Filter unknown fields to prevent column name injection
+	for k := range updates {
+		if !secureCLIAllowedFields[k] {
+			delete(updates, k)
+		}
+	}
+
 	// Encrypt env if present in updates
 	if envVal, ok := updates["encrypted_env"]; ok {
 		if envStr, isStr := envVal.(string); isStr && envStr != "" && s.encKey != "" {

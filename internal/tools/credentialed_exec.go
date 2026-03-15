@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/exec"
 	"regexp"
@@ -87,6 +88,7 @@ func matchesBinaryDeny(args []string, denyPatternsJSON json.RawMessage) string {
 	for _, p := range patterns {
 		re, err := regexp.Compile(p)
 		if err != nil {
+			slog.Warn("secure_cli.invalid_deny_pattern", "pattern", p, "error", err)
 			continue
 		}
 		if re.MatchString(argsStr) {
@@ -177,7 +179,9 @@ func (t *ExecTool) executeCredentialedSandbox(ctx context.Context, absPath strin
 
 	sb, err := t.sandboxMgr.Get(ctx, sandboxKey, t.workingDir, SandboxConfigFromCtx(ctx))
 	if err != nil {
-		// Fallback to host if sandbox unavailable
+		slog.Warn("security.credentialed_exec_sandbox_fallback",
+			"binary", absPath, "error", err,
+			"detail", "sandbox unavailable, falling back to host execution with credentials")
 		return t.executeCredentialedHost(ctx, absPath, args, cwd, envMap, timeout)
 	}
 

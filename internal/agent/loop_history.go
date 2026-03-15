@@ -32,11 +32,11 @@ func (l *Loop) filteredToolNames() []string {
 
 // buildCredentialCLIContext generates the TOOLS.md supplement for credentialed CLIs.
 // Returns empty string if no secure CLI store is configured or no enabled CLIs.
-func (l *Loop) buildCredentialCLIContext() string {
+func (l *Loop) buildCredentialCLIContext(ctx context.Context) string {
 	if l.secureCLIStore == nil {
 		return ""
 	}
-	creds, err := l.secureCLIStore.ListEnabled(context.Background())
+	creds, err := l.secureCLIStore.ListEnabled(ctx)
 	if err != nil || len(creds) == 0 {
 		return ""
 	}
@@ -147,7 +147,7 @@ func (l *Loop) buildMessages(ctx context.Context, history []providers.Message, s
 		SandboxContainerDir:    l.sandboxContainerDir,
 		SandboxWorkspaceAccess: l.sandboxWorkspaceAccess,
 		SelfEvolve:             l.selfEvolve,
-		CredentialCLIContext:   l.buildCredentialCLIContext(),
+		CredentialCLIContext:   l.buildCredentialCLIContext(ctx),
 	})
 
 	messages = append(messages, providers.Message{

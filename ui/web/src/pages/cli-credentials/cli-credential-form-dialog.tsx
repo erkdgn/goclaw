@@ -141,6 +141,13 @@ export function CliCredentialFormDialog({ open, onOpenChange, credential, preset
             </div>
           )}
 
+
+          {/* Existing credentials indicator (edit mode) */}
+          {isEdit && (
+            <p className="text-xs text-muted-foreground rounded-md border border-dashed p-2">
+              Credentials are encrypted and cannot be displayed. Leave environment variables empty to keep existing values, or re-enter to update.
+            </p>
+          )}
           {/* Env var inputs from preset */}
           {activePreset && activePreset.env_vars.length > 0 && (
             <div className="grid gap-3 rounded-md border p-3">

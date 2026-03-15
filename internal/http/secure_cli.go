@@ -172,7 +172,8 @@ func (h *SecureCLIHandler) handleCreate(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	b.EncryptedEnv = nil // don't return credentials
+	tools.ResetCredentialScrubValues() // clear stale scrub values
+	b.EncryptedEnv = nil               // don't return credentials
 	emitAudit(h.msgBus, r, "secure_cli.created", "secure_cli", b.ID.String())
 	h.emitCacheInvalidate(b.ID.String())
 	writeJSON(w, http.StatusCreated, b)
@@ -237,6 +238,7 @@ func (h *SecureCLIHandler) handleUpdate(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	tools.ResetCredentialScrubValues() // clear stale scrub values
 	emitAudit(h.msgBus, r, "secure_cli.updated", "secure_cli", id.String())
 	h.emitCacheInvalidate(id.String())
 	writeJSON(w, http.StatusOK, map[string]string{"status": "updated"})
@@ -256,6 +258,7 @@ func (h *SecureCLIHandler) handleDelete(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	tools.ResetCredentialScrubValues() // clear stale scrub values
 	emitAudit(h.msgBus, r, "secure_cli.deleted", "secure_cli", id.String())
 	h.emitCacheInvalidate(id.String())
 	writeJSON(w, http.StatusOK, map[string]string{"status": "deleted"})

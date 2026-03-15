@@ -84,6 +84,14 @@ func ResetDynamicScrubValues() {
 	dynamicScrubValues = nil
 }
 
+// ResetCredentialScrubValues clears all credential scrub values.
+// Called when credentials are updated to prevent stale values from accumulating.
+func ResetCredentialScrubValues() {
+	credentialScrubMu.Lock()
+	defer credentialScrubMu.Unlock()
+	credentialScrubValues = nil
+}
+
 // AddCredentialScrubValues adds credential values to the scrub list.
 // These are replaced with [REDACTED] (not [SERVER_IP]).
 // Thread-safe. Deduplicates. Empty/short strings ignored.
